@@ -16,6 +16,7 @@ module.exports = {
   getSongsList: function (req, res, next) {
     Song.find({})
     .populate('snippets users owner')
+    .select('-password')
     .exec(function (err, songs) {
       if (err) return console.log("Get Songs Error: ", err)
       res.json(songs)
