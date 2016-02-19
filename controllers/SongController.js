@@ -14,10 +14,11 @@ var mongoose = require('mongoose')
 
 module.exports = {
   getSongsList: function (req, res, next) {
-    Song.find({}).then(function (songs) {
+    Song.find({})
+    .populate('snippets users owner')
+    .exec(function (err, songs) {
+      if (err) return console.log("Get Songs Error: ", err)
       res.json(songs)
-    }).catch(function (err) {
-      console.log(err)
     })
   },
   getSong: function (req, res, next) {
@@ -31,16 +32,16 @@ module.exports = {
         newSong[key] = options[key]
       }
       newSong.snippets.push(snippet)
-      console.log(newSong.snippets) // array of objects
+      newSong.users.push(options.owner)
       newSong.save(function (err) {
         if (err) return console.log('ERROR: ', err)
       })
     } else {
-      console.log("SONG URL: ", options.songUrl)
       Song.update(
         { "songUrl": options.songUrl[0] },
-        { "$push": {
-            "snippets": snippet._id
+      { "$push": {
+            "snippets": snippet._id,
+            "users": options.owner
         }},
         function(err, numAffected) {
           if (err) {

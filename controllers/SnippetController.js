@@ -75,6 +75,7 @@ module.exports = {
         newSnippet.save(function (err) {
           if (err) return console.log(err)
           status.saved = true
+        console.log("OPTIONS: ", options)
           SongController.addSnippet(newSnippet, song, options)
         })
         // console.log("done", data);
@@ -86,12 +87,11 @@ module.exports = {
   },
   getSnippetsForSong: function (req, res, next) {
     Song.findById(req.params.song)
-      .then(function (song) {
-        Snippet.populate(song, { path: 'snippets', model: 'Snippet' }, function (err, song) {
-          res.send(song.snippets)
-        })
-      }, function (err) {
-        console.log("Get Snippets Error: ", err)
+      // .populate('snippets')
+      .populate('snippets users owner')
+      .exec(function (err, song) {
+        if (err) return console.log("Get Snippets Error: ", err)
+        res.send(song.snippets)
       })
   }
 }

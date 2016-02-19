@@ -3,26 +3,13 @@ var Schema = mongoose.Schema;
 var Promise = require('bluebird');
 var bcrypt = Promise.promisifyAll(require('../node_modules/bcrypt'));
 
-
 var userSchema = Schema({
-      fb: {
-        id: String,
-        access_token: String,
-        firstName: String,
-        lastName: String,
-        email: String
-      },
-
-      name: { first : String,
-              last  : String
-            },
-      username:           String,
-      email:              String,
-      password:           String,
-      profile_image_url:  String,
-      friends:            [ { } ] //type: Schema.Types.ObjectId, ref: 'User'
-      // restaurants: [{ type: Schema.Types.ObjectId, ref: 'Restaurant' }]
-
+      username          : String,
+      email             : String,
+      password          : String,
+      profile_image_url : String,
+      friends           : [ {type: mongoose.Schema.Types.ObjectId,
+                              ref: 'User' } ]
 })
 
 userSchema.pre('save',function (next){
@@ -37,15 +24,15 @@ userSchema.pre('save',function (next){
             console.log("hash: " + hash);
             user.password = hash;
             next();
-        });
+        })
     })
-});
+})
 
-userSchema.methods.comparePasswordAsync = function(candidatePassword) {
-    return bcrypt.compareAsync(candidatePassword, this.password);
-};
+userSchema.methods.comparePasswordSync = function(candidatePassword) {
+    return bcrypt.compareSync(candidatePassword, this.password)
+}
 
 
 
 var User = mongoose.model('User', userSchema)
-module.exports = User;
+module.exports = User
